@@ -21,10 +21,9 @@ class TestAuthorizationNegative:
         """
         page.goto("https://intern.demoshopping.ru/")
         page.get_by_role("button", name="Регистрация / Войти").click()
-        page.get_by_role("button", name="Войти").click()
 
-        page.get_by_role("textbox", name="Логин:").fill(username)
-        page.get_by_role("textbox", name="Пароль:").fill(password)
+        page.get_by_role("textbox", name="Login:").fill(username)
+        page.get_by_role("textbox", name="Password:").fill(password)
         page.get_by_role("button", name="Войти").click()
 
         expect(page.get_by_text(expected_error)).to_be_visible()
@@ -36,10 +35,9 @@ class TestAuthorizationNegative:
         """
         page.goto("https://intern.demoshopping.ru/")
         page.get_by_role("button", name="Регистрация / Войти").click()
-        page.get_by_role("button", name="Войти").click()
 
-        page.get_by_role("textbox", name="Логин:").fill("TestUser123")
-        page.get_by_role("textbox", name="Пароль:").fill("ValidPass123")
+        page.get_by_role("textbox", name="Login:").fill("TestUser123")
+        page.get_by_role("textbox", name="Password:").fill("ValidPass123")
 
         page.get_by_role("button", name="Войти").click()
 
