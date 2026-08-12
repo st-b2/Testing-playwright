@@ -5,35 +5,48 @@ misc.xml
 modules.xml
 *.swp
 *.swo
-*~
 
-# Python
+# Python cache
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
-env/
-venv/
-ENV/
-.venv
-pip-log.txt
-pip-delete-this-directory.txt
+
+# Test cache
 .pytest_cache/
+.tox/
 .coverage
 htmlcov/
-.tox/
-.mypy_cache/
-.dmypy.json
-dmypy.json
-*.log
-
-# Test
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Abandoned tests
 !!!!(abandoned)!!!!/
 selenium/
+
+# Conda
+env/
+venv/
+.venv/
+*.conda
+*.env
+conda-meta/
+conda-env/
+
+# Logs
+*.log
+log.txt
+
+# Selenium
+selenium-server-*.jar
+geckodriver.exe
+chromedriver.exe
+
+# Environment
+environment.yml
+requirements.txt
 
 # OS
 .DS_Store
