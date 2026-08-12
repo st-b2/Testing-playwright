@@ -1,7 +1,5 @@
 # Testing-playwright
 
-## Установка
-
 1. Клонируйте репозиторий:
 ```bash
 git clone https://github.com/st-b2/Testing-playwright.git
@@ -32,4 +30,14 @@ tests/
 │       ├── test_reg_neg.py
 │       └── test_reg_pos.py
 └── (abandoned) selenium + p.../ (игнорируется)
+```
+
+5. Требования
+```bash
+- Python 3.11+
+- Playwright
+- Pytest
+- Miniconda / Anaconda (environment)
+
+[!] Подробнее - environment.yml
 ```
