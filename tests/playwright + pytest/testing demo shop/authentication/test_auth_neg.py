@@ -45,5 +45,3 @@ class TestAuthorizationNegative:
 
         try:
             expect(page.get_by_text("Произошла ошибка при обработке запроса")).to_be_visible(timeout=3000)
-        except:
-            expect(page.get_by_text("Привет, TestUser123")).to_be_visible(timeout=3000)
