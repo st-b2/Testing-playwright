@@ -10,12 +10,7 @@ cd Testing-playwright
 conda create -n test_env python=3.11
 conda activate test_env
 ```
-3. Установка зависимостей
-```bash
-pip install -r requirements.txt
-playwright install
-```
-4. Структура репозитория
+3. Структура репозитория
 ```text
 tests/
 ├── conftest.py
@@ -31,8 +26,7 @@ tests/
 │       └── test_reg_pos.py
 └── (abandoned) selenium + p.../ (игнорируется)
 ```
-
-5. Требования
+4. Требования
 ```bash
 - Python 3.11+
 - Playwright
