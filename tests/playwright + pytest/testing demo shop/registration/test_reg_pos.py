@@ -1,11 +1,12 @@
 import pytest
 from playwright.sync_api import Page, expect
+from pages.home_store_page import HomeStorePage
+from pages.reg_and_login_page import RegistrationPage
 
 
 class TestRegistration:
     """Тесты регистрации пользователя"""
 
-    # Позитивные тесты - валидные данные
     @pytest.mark.parametrize("username,password", [
         ('TestUser1332', 'Password12366'),  # Буквы + цифры
         ('User_456', 'Admin123'),  # Символ _ в логине, минимальная длина пароля
@@ -14,19 +15,13 @@ class TestRegistration:
     def test_positive_registration(self, page: Page, username, password):
         """
         Позитивный тест: успешная регистрация с валидными данными
-
-        [!] Измените фикстуру с полями логина и пароля
         """
-        page.goto("https://intern.demoshopping.ru/")
+        home_page = HomeStorePage(page)
+        reg_page = RegistrationPage(page)
 
-        expect(page.get_by_role("button", name="Регистрация / Войти")).to_be_visible()
-        page.get_by_role("button", name="Регистрация / Войти").click()
+        home_page.reg_or_login.click()
 
-        page.get_by_role("textbox", name="Логин:").click()
-        page.get_by_role("textbox", name="Логин:").fill(username)
-        page.get_by_role("textbox", name="Пароль:").click()
-        page.get_by_role("textbox", name="Пароль:").fill(password)
-        page.get_by_role("button", name="Зарегистрироваться").click()
+        reg_page.registration(username, password)
 
         expect(page.get_by_text("Регистрация выполнена успешно")).to_be_visible(timeout=5000)
 
@@ -37,30 +32,35 @@ class TestRegistration:
         ('TestUser', 'Pass1234'),  # Минимальная длина пароля (8 символов)
     ])
     def test_boundary_valid_values(self, page: Page, username, password):
-        """Позитивный тест: граничные валидные значения"""
-        page.goto("https://intern.demoshopping.ru/")
-        page.get_by_role("button", name="Регистрация / Войти").click()
+        """
+        Позитивный тест: граничные валидные значения
+        """
+        home_page = HomeStorePage(page)
+        reg_page = RegistrationPage(page)
 
-        page.get_by_role("textbox", name="Логин:").fill(username)
-        page.get_by_role("textbox", name="Пароль:").fill(password)
-        page.get_by_role("button", name="Зарегистрироваться").click()
+        home_page.reg_or_login.click()
+
+        reg_page.registration(username, password)
 
         expect(page.get_by_text("Регистрация выполнена успешно")).to_be_visible(timeout=5000)
 
-    # Тест безопасности - SQL инъекция
     @pytest.mark.parametrize("username,password", [
         ("' OR '1'='1", "test123"),
         ("admin' --", "password"),
         ("'; DROP TABLE users; --", "test"),
     ])
     def test_security_sql_injection(self, page: Page, username, password):
-        """Тест безопасности: проверка защиты от SQL-инъекций"""
-        page.goto("https://intern.demoshopping.ru/")
-        page.get_by_role("button", name="Регистрация / Войти").click()
+        """
+        Тест безопасности: проверка защиты от SQL-инъекций
+        """
+        home_page = HomeStorePage(page)
+        reg_page = RegistrationPage(page)
 
-        page.get_by_role("textbox", name="Логин:").fill(username)
-        page.get_by_role("textbox", name="Пароль:").fill(password)
-        page.get_by_role("button", name="Зарегистрироваться").click()
+        home_page.reg_or_login.click()
+
+        reg_page.reg_enter_username(username)
+        reg_page.reg_enter_password(password)
+        reg_page.click_reg()
 
         try:
             expect(page.get_by_text(
@@ -68,4 +68,3 @@ class TestRegistration:
                 timeout=3000)
         except:
             expect(page.get_by_role("button", name="Зарегистрироваться")).to_be_visible()
-

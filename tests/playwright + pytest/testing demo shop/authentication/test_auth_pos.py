@@ -1,5 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
+from pages.home_store_page import HomeStorePage
+from pages.reg_and_login_page import LoginPage
 
 
 class TestAuthorization:
@@ -15,19 +17,15 @@ class TestAuthorization:
         """
         Позитивный тест: успешная авторизация с валидными данными
         """
-        page.goto("https://intern.demoshopping.ru/login")
+        login_page = LoginPage(page)
+        home_page = HomeStorePage(page)
 
-        page.get_by_role("textbox", name="Login:").click()
-        page.get_by_role("textbox", name="Login:").fill(username)
-        page.get_by_role("textbox", name="Password:").click()
-        page.get_by_role("textbox", name="Password:").fill(password)
-        page.get_by_role("button", name="Войти", exact=True).click()
+        home_page.reg_or_login.click()
 
-        # Проверяем редирект на главную страницу
+        login_page.login(username, password)
+
         expect(page).to_have_url("https://intern.demoshopping.ru/")
-
-        # Проверяем, что кнопка сменилась на "Выйти"
-        expect(page.get_by_role("button", name="Выйти")).to_be_visible(timeout=5000)
+        home_page.logout_is_visible()
 
     # Граничные тесты
     @pytest.mark.parametrize("username,password", [
@@ -36,23 +34,21 @@ class TestAuthorization:
         ('TestUser', 'Pass1234'),             # Минимальная длина пароля (8 символов)
     ])
     def test_boundary_valid_values(self, page: Page, username, password):
-        """Позитивный тест: граничные валидные значения
+        """
+        Позитивный тест: граничные валидные значения
 
         [!] Тесты должны пройти, однако тесты с вводом ключей (логин:пароль) 1 и 3 не пройдут,
         так как в самом сайте ошибки сделаны намеренно (для локализации и тренинга)
-
         """
-        page.goto("https://intern.demoshopping.ru/")
-        page.get_by_role("button", name="Регистрация / Войти").click()
+        home_page = HomeStorePage(page)
+        login_page = LoginPage(page)
 
-        page.get_by_role("textbox", name="Login:").fill(username)
-        page.get_by_role("textbox", name="Password:").fill(password)
-        page.get_by_role("button", name="Войти").click()
+        home_page.reg_or_login.click()
 
-        # Проверяем редирект на главную страницу
+        login_page.login(username, password)
+
         expect(page).to_have_url("https://intern.demoshopping.ru/")
-
-        expect(page.get_by_role("button", name="Выйти")).to_be_visible()
+        home_page.logout_is_visible()
 
     # Тест безопасности - SQL инъекция
     @pytest.mark.parametrize("username,password", [
@@ -61,18 +57,20 @@ class TestAuthorization:
         ("'; DROP TABLE users; --", "test"),
     ])
     def test_security_sql_injection(self, page: Page, username, password):
-        """Тест безопасности: проверка защиты от SQL-инъекци"""
-        page.goto("https://intern.demoshopping.ru/login")
+        """
+        Тест безопасности: проверка защиты от SQL-инъекций
+        """
+        login_page = LoginPage(page)
+        home_page = HomeStorePage(page)
 
-        page.get_by_role("textbox", name="Login:").fill(username)
-        page.get_by_role("textbox", name="Password:").fill(password)
-        page.get_by_role("button", name="Войти", exact=True).click()
+        home_page.reg_or_login.click()
+
+        login_page.login(username, password)
 
         try:
-            (expect(page.get_by_text("Логин должен содержать от 3 до 15 символов "
-                                     "и может включать буквы, цифры и символы: _ "
+            expect(page.get_by_text("Логин должен содержать от 3 до 15 символов "
+                                    "и может включать буквы, цифры и символы: _ "
                                     "Пароль должен содержать не менее 8 символов, "
-                                     "включая минимум одну букву и одну цифру")).
-             to_be_visible(timeout=3000))
+                                    "включая минимум одну букву и одну цифру")).to_be_visible(timeout=3000)
         except:
             expect(page.get_by_role("button", name="Войти", exact=True)).to_be_visible()

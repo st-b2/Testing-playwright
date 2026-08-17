@@ -1,11 +1,12 @@
 import pytest
 from playwright.sync_api import Page, expect
+from pages.home_store_page import HomeStorePage
+from pages.reg_and_login_page import LoginPage
 
 
 class TestAuthorizationNegative:
     """Негативные тесты авторизации пользователя"""
 
-    # Негативные тесты - невалидные данные
     @pytest.mark.parametrize("username,password,expected_error", [
         # Пустые поля - проверяем, что страница не изменилась
         ('', 'Password123', None),
@@ -26,29 +27,28 @@ class TestAuthorizationNegative:
         {'ab','Password123'}
         тест падает, так как это ошибка на сайте, не соответствует ошибке из ТЗ
         """
-        page.goto("https://intern.demoshopping.ru/login")
+        login_page = LoginPage(page)
+        home_page = HomeStorePage(page)
+
+        home_page.reg_or_login.click()
         current_url = page.url
 
-        page.get_by_role("textbox", name="Login:").fill(username)
-        page.get_by_role("textbox", name="Password:").fill(password)
-        page.get_by_role("button", name="Войти", exact=True).click()
+        login_page.login(username, password)
 
         if expected_error is None:
-            # Для пустых полей - проверяем, что мы остались на той же странице
             expect(page).to_have_url(current_url)
         else:
-            # Для остальных случаев - проверяем сообщение об ошибке
             expect(page.get_by_text(expected_error)).to_be_visible()
 
-    # Тест на проверку сообщения при ошибке сервера
     def test_server_error_handling(self, page: Page):
         """
         Тест обработки ошибки сервера
         """
-        page.goto("https://intern.demoshopping.ru/login")
-        page.get_by_role("textbox", name="Login:").fill("TestUser123")
-        page.get_by_role("textbox", name="Password:").fill("ValidPass123")
+        login_page = LoginPage(page)
+        home_page = HomeStorePage(page)
 
-        page.get_by_role("button", name="Войти", exact=True).click()
+        home_page.reg_or_login.click()
+
+        login_page.login("TestUser123", "ValidPass123")
 
         expect(page.get_by_text("Произошла ошибка при обработке запроса")).to_be_visible(timeout=3000)
